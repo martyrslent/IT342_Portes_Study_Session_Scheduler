@@ -1,4 +1,4 @@
-package com.lab1.backend.config;
+package edu.cit.portes.studysessionscheduler.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,15 +14,17 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder(); // This fulfills the BCrypt requirement
     }
-
+    
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable()) // Disabled for local lab development
+            .cors(cors -> cors.configure(http)) // 1. Add this to enable CORS support in Security
+            .csrf(csrf -> csrf.disable()) 
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/**").permitAll() // Allow Login/Register
-                .anyRequest().authenticated() // Protect everything else (like /api/user/me)
-            );
-        return http.build();
+            .requestMatchers("/api/auth/**").permitAll() 
+            .requestMatchers("/api/sessions/**").permitAll() // 2. Allow browsing sessions
+            .anyRequest().authenticated() 
+             );
+         return http.build();
     }
 }

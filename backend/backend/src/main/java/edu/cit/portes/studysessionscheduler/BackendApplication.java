@@ -1,4 +1,4 @@
-package com.lab1.backend;
+package edu.cit.portes.studysessionscheduler;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

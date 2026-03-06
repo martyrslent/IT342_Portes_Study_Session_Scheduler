@@ -1,4 +1,4 @@
-package com.lab1.backend.model;
+package edu.cit.portes.studysessionscheduler.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
