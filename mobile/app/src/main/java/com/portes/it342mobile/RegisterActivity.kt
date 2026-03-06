@@ -17,7 +17,7 @@ class RegisterActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_register)
 
-        val etUsername = findViewById<EditText>(R.id.etName) // Your XML ID is etName, but we'll map it to username
+        val etUsername = findViewById<com.google.android.material.textfield.TextInputEditText>(R.id.etUsername)
         val etEmail = findViewById<EditText>(R.id.etEmail)
         val etPassword = findViewById<EditText>(R.id.etPassword)
         val btnRegister = findViewById<Button>(R.id.btnRegister)

@@ -1,5 +1,6 @@
 package com.portes.it342mobile
 
+import retrofit2.http.GET
 import retrofit2.Call
 import retrofit2.http.Body
 import retrofit2.http.POST
@@ -23,7 +24,11 @@ data class AuthResponse(
 )
 
 interface ApiService {
+    @POST("api/sessions")
+    fun createSession(@Body session: StudySession): Call<StudySession>
 
+    @GET("api/sessions")
+    fun getAllSessions(): Call<List<StudySession>>
     // Removed leading slash; combines with RetrofitClient BASE_URL
     // Matches @RequestMapping("/api") + @PostMapping("/auth/login")
     @POST("api/auth/login")
