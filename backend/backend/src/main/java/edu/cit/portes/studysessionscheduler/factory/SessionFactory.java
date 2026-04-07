@@ -1,0 +1,17 @@
+package edu.cit.portes.studysessionscheduler.factory;
+
+import edu.cit.portes.studysessionscheduler.model.StudySession;
+
+public class SessionFactory {
+    
+    public static StudySession createDefaultSession(String topic, String location, String date, String time, int maxLimit, int maxParticipants) {
+        StudySession session = new StudySession();
+        session.setTopic(topic);
+        session.setLocation(location);
+        session.setDate(date);
+        session.setTime(time);
+        session.setMaxParticipants(maxParticipants);
+        session.setCurrentParticipants(0); 
+        return session;
+    }
+}

@@ -8,27 +8,51 @@ const Dashboard = () => {
     topic: '', location: '', date: '', time: '', maxLimit: 5
   });
 
+  // Updated to Port 8081
+  const API_BASE = 'http://localhost:8081/api/sessions';
+
   const fetchSessions = async () => {
     try {
-      const res = await fetch('http://localhost:8080/api/sessions');
+      const res = await fetch(API_BASE);
       const data = await res.json();
       setSessions(data);
-    } catch (err) { console.error("Error fetching sessions:", err); }
+    } catch (err) { 
+      console.error("Error fetching sessions:", err); 
+    }
   };
 
   useEffect(() => { fetchSessions(); }, []);
 
   const handleCreateSession = async (e) => {
     e.preventDefault();
-    console.log("Submitting session:", newSession); // DEBUG LOG
-    const res = await fetch('http://localhost:8080/api/sessions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newSession)
-    });
-    if (res.ok) {
-      setShowCreateModal(false);
-      fetchSessions();
+    try {
+      const res = await fetch(API_BASE, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newSession)
+      });
+      if (res.ok) {
+        setShowCreateModal(false);
+        fetchSessions(); // Refresh list after creating
+      }
+    } catch (err) {
+      alert("Backend unreachable on 8081.");
+    }
+  };
+
+  // NEW: Logic to "Join" a session (increments participant count)
+  const handleJoinSession = async (sessionId) => {
+    try {
+      const res = await fetch(`${API_BASE}/${sessionId}/join`, {
+        method: 'POST'
+      });
+      if (res.ok) {
+        alert("Successfully joined the session!");
+        setSelectedSession(null);
+        fetchSessions(); // Refresh list to see updated count
+      }
+    } catch (err) {
+      console.error("Join failed:", err);
     }
   };
 
@@ -39,10 +63,7 @@ const Dashboard = () => {
         <button 
           className="btn" 
           style={{width: 'auto', padding: '10px 20px'}} 
-          onClick={() => {
-            console.log("Create Button Clicked!"); // DEBUG LOG
-            setShowCreateModal(true);
-          }}
+          onClick={() => setShowCreateModal(true)}
         >
           + Create Session
         </button>
@@ -50,7 +71,7 @@ const Dashboard = () => {
 
       {/* --- SESSION GRID --- */}
       <div className="session-grid">
-        {sessions.length === 0 && <p>No sessions found. Create one!</p>}
+        {sessions.length === 0 && <p style={{textAlign: 'center', gridColumn: '1/-1'}}>No sessions found. Be the first to create one!</p>}
         {sessions.map(session => (
           <div key={session.id} className="session-card">
             <span className="badge">{session.topic}</span>
@@ -76,7 +97,7 @@ const Dashboard = () => {
               <input type="time" onChange={e => setNewSession({...newSession, time: e.target.value})} required />
               <input type="number" placeholder="Max Participants" onChange={e => setNewSession({...newSession, maxLimit: e.target.value})} required />
               <button type="submit" className="btn">Post Session</button>
-              <button type="button" onClick={() => setShowCreateModal(false)} className="btn-secondary">Cancel</button>
+              <button type="button" onClick={() => setShowCreateModal(false)} className="btn-secondary" style={{marginTop: '5px'}}>Cancel</button>
             </form>
           </div>
         </div>
@@ -84,21 +105,24 @@ const Dashboard = () => {
 
       {/* --- SESSION DETAIL VIEW --- */}
       {selectedSession && (
-        <div className="modal-overlay">
-          <div className="card modal-content" style={{background: 'white'}}>
-            <span className="badge">{selectedSession.topic}</span>
-            <h2>{selectedSession.topic} Details</h2>
+        <div className="modal-overlay" style={{display: 'flex'}}>
+          <div className="card modal-content" style={{background: 'white', padding: '2rem'}}>
+            <span className="badge" style={{marginBottom: '10px'}}>{selectedSession.topic}</span>
+            <h2>Session Details</h2>
             <p><strong>Location:</strong> {selectedSession.location}</p>
             <p><strong>Schedule:</strong> {selectedSession.date} at {selectedSession.time}</p>
-            <p><strong>Capacity:</strong> {selectedSession.currentParticipants} of {selectedSession.maxLimit} joined</p>
-            <button 
-              className="btn" 
-              disabled={selectedSession.currentParticipants >= selectedSession.maxLimit}
-              onClick={() => alert("Joining logic goes here!")}
-            >
-              {selectedSession.currentParticipants >= selectedSession.maxLimit ? 'Session Full' : 'Join This Session'}
-            </button>
-            <button onClick={() => setSelectedSession(null)} className="btn-secondary">Close</button>
+            <p style={{marginBottom: '20px'}}><strong>Capacity:</strong> {selectedSession.currentParticipants || 0} of {selectedSession.maxLimit} joined</p>
+            
+            <div style={{display: 'flex', flexDirection: 'column', gap: '10px'}}>
+                <button 
+                className="btn" 
+                disabled={selectedSession.currentParticipants >= selectedSession.maxLimit}
+                onClick={() => handleJoinSession(selectedSession.id)}
+                >
+                {selectedSession.currentParticipants >= selectedSession.maxLimit ? 'Session Full' : 'Join This Session'}
+                </button>
+                <button onClick={() => setSelectedSession(null)} className="btn-secondary">Close</button>
+            </div>
           </div>
         </div>
       )}

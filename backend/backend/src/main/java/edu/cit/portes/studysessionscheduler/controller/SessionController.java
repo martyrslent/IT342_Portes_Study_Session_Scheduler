@@ -2,6 +2,7 @@ package edu.cit.portes.studysessionscheduler.controller;
 
 import edu.cit.portes.studysessionscheduler.model.StudySession;
 import edu.cit.portes.studysessionscheduler.repository.SessionRepository;
+import edu.cit.portes.studysessionscheduler.service.SessionService;
 
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
@@ -11,21 +12,21 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:3000")
 public class SessionController {
 
-    private final SessionRepository sessionRepository;
+    // BEFORE: private final SessionRepository sessionRepository;
+    // AFTER: Using the Service Facade
+    private final SessionService sessionService;
 
-    public SessionController(SessionRepository sessionRepository) {
-        this.sessionRepository = sessionRepository;
+    public SessionController(SessionService sessionService) {
+        this.sessionService = sessionService;
     }
 
-    // This fulfills the "View available sessions" requirement
     @GetMapping
     public List<StudySession> getAllSessions() {
-        return sessionRepository.findAll();
+        return sessionService.getAllSessions();
     }
 
-    // This fulfills the "Add study sessions" requirement
     @PostMapping
     public StudySession createSession(@RequestBody StudySession session) {
-        return sessionRepository.save(session);
+        return sessionService.createSession(session);
     }
 }

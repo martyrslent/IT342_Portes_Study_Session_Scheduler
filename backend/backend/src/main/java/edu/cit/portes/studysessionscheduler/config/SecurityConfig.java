@@ -16,15 +16,15 @@ public class SecurityConfig {
     }
     
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-            .cors(cors -> cors.configure(http)) // 1. Add this to enable CORS support in Security
-            .csrf(csrf -> csrf.disable()) 
-            .authorizeHttpRequests(auth -> auth
+public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    http
+        .cors(org.springframework.security.config.Customizer.withDefaults()) // Use standard CORS defaults
+        .csrf(csrf -> csrf.disable()) 
+        .authorizeHttpRequests(auth -> auth
             .requestMatchers("/api/auth/**").permitAll() 
-            .requestMatchers("/api/sessions/**").permitAll() // 2. Allow browsing sessions
+            .requestMatchers("/api/sessions/**").permitAll() 
             .anyRequest().authenticated() 
-             );
-         return http.build();
-    }
+        );
+     return http.build();
+}
 }

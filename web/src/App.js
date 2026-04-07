@@ -2,32 +2,49 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
 import './App.css';
 
+// SINGLETON CONFIGURATION: Change this once, it updates the whole app.
+const API_BASE_URL = 'http://localhost:8081/api';
+
 // --- REGISTER COMPONENT ---
 const Register = () => {
   const [user, setUser] = useState({ username: '', email: '', password: '' });
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
+    // Logic: Restrict to CIT institution
     if (!user.email.endsWith("@cit.edu")) { 
-      alert("Registration is restricted to students of this institution only.");
+      alert("Registration is restricted to @cit.edu emails only.");
       return;
     }
-    const res = await fetch('http://localhost:8080/api/auth/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(user)
-    });
-    if (res.ok) { 
-      alert("Registration successful!"); 
-      window.location.href = '/login'; 
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/auth/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(user)
+      });
+
+      if (res.ok) { 
+        alert("Registration successful! Please login."); 
+        window.location.href = '/login'; 
+      } else {
+        const errData = await res.json();
+        alert("Registration failed: " + (errData.message || "Unknown error"));
+      }
+    } catch (error) {
+      console.error("Connection Error:", error);
+      alert("Could not connect to the Backend. Ensure Spring Boot is running on 8081.");
     }
   };
+
   return (
     <div className="container" style={{maxWidth: '400px'}}>
       <div className="card">
         <h2>Register Page</h2>
         <form onSubmit={handleSubmit}>
           <div className="input-group"><input type="text" placeholder="Username" onChange={e => setUser({...user, username: e.target.value})} required /></div>
-          <div className="input-group"><input type="email" placeholder="Institutional Email" onChange={e => setUser({...user, email: e.target.value})} required /></div>
+          <div className="input-group"><input type="email" placeholder="student@cit.edu" onChange={e => setUser({...user, email: e.target.value})} required /></div>
           <div className="input-group"><input type="password" placeholder="Password" onChange={e => setUser({...user, password: e.target.value})} required /></div>
           <button type="submit" className="btn">Register</button>
         </form>
@@ -39,18 +56,33 @@ const Register = () => {
 // --- LOGIN COMPONENT ---
 const Login = () => {
   const [credentials, setCredentials] = useState({ username: '', password: '' });
+  
   const handleLogin = async (e) => {
     e.preventDefault();
-    const res = await fetch('http://localhost:8080/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(credentials)
-    });
-    if (res.ok) {
-      localStorage.setItem('user', JSON.stringify({ loggedIn: true, username: credentials.username }));
-      window.location.href = '/dashboard'; 
-    } else { alert("Login failed."); }
+    try {
+      const res = await fetch(`${API_BASE_URL}/auth/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(credentials)
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        // Store session in localStorage (Proxy Pattern for Session Management)
+        localStorage.setItem('user', JSON.stringify({ 
+          loggedIn: true, 
+          username: credentials.username,
+          token: data.token 
+        }));
+        window.location.href = '/dashboard'; 
+      } else { 
+        alert("Login failed. Check your credentials."); 
+      }
+    } catch (error) {
+      alert("Backend is unreachable. Check Port 8081.");
+    }
   };
+
   return (
     <div className="container" style={{maxWidth: '400px'}}>
       <div className="card">
@@ -65,7 +97,7 @@ const Login = () => {
   );
 };
 
-// --- REVISED DASHBOARD COMPONENT ---
+// --- DASHBOARD COMPONENT ---
 const Dashboard = () => {
   const [sessions, setSessions] = useState([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -76,25 +108,29 @@ const Dashboard = () => {
 
   const fetchSessions = async () => {
     try {
-      const res = await fetch('http://localhost:8080/api/sessions');
-      const data = await res.json();
-      setSessions(data);
-    } catch (err) { console.error("Error fetching:", err); }
+      const res = await fetch(`${API_BASE_URL}/sessions`);
+      if (res.ok) {
+        const data = await res.json();
+        setSessions(data);
+      }
+    } catch (err) { console.error("Error fetching sessions:", err); }
   };
 
   useEffect(() => { fetchSessions(); }, []);
 
   const handleCreateSession = async (e) => {
     e.preventDefault();
-    const res = await fetch('http://localhost:8080/api/sessions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(newSession)
-    });
-    if (res.ok) {
-      setShowCreateModal(false);
-      fetchSessions();
-    }
+    try {
+      const res = await fetch(`${API_BASE_URL}/sessions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newSession)
+      });
+      if (res.ok) {
+        setShowCreateModal(false);
+        fetchSessions();
+      }
+    } catch (err) { alert("Error creating session."); }
   };
 
   return (
@@ -170,8 +206,8 @@ function App() {
             </>
           ) : (
             <>
-              <Link to="/dashboard">Dashboard</Link>
-              <button className="btn" style={{width: 'auto', marginLeft: '15px'}} onClick={() => {
+              <Link to="/dashboard" style={{marginRight: '15px'}}>Dashboard</Link>
+              <button className="btn" style={{width: 'auto'}} onClick={() => {
                 localStorage.removeItem('user');
                 window.location.href = '/login';
               }}>Logout</button>
