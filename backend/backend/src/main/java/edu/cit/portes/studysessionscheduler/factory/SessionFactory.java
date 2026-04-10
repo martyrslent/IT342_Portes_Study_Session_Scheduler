@@ -4,7 +4,7 @@ import edu.cit.portes.studysessionscheduler.model.StudySession;
 
 public class SessionFactory {
     
-    public static StudySession createDefaultSession(String topic, String location, String date, String time, int maxLimit, int maxParticipants) {
+    public static StudySession createDefaultSession(String topic, String location, String date, String time, int maxParticipants, String createdBy) {
         StudySession session = new StudySession();
         session.setTopic(topic);
         session.setLocation(location);
@@ -12,6 +12,7 @@ public class SessionFactory {
         session.setTime(time);
         session.setMaxParticipants(maxParticipants);
         session.setCurrentParticipants(0); 
+        session.setCreatedBy(createdBy); 
         return session;
     }
 }

@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, Navigate } from 'react-router-dom';
 import './App.css';
 
-// SINGLETON CONFIGURATION: Change this once, it updates the whole app.
+// SINGLETON CONFIGURATION
 const API_BASE_URL = 'http://localhost:8081/api';
 
 // --- REGISTER COMPONENT ---
@@ -11,20 +11,16 @@ const Register = () => {
   
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Logic: Restrict to CIT institution
     if (!user.email.endsWith("@cit.edu")) { 
       alert("Registration is restricted to @cit.edu emails only.");
       return;
     }
-
     try {
       const res = await fetch(`${API_BASE_URL}/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(user)
       });
-
       if (res.ok) { 
         alert("Registration successful! Please login."); 
         window.location.href = '/login'; 
@@ -33,8 +29,7 @@ const Register = () => {
         alert("Registration failed: " + (errData.message || "Unknown error"));
       }
     } catch (error) {
-      console.error("Connection Error:", error);
-      alert("Could not connect to the Backend. Ensure Spring Boot is running on 8081.");
+      alert("Could not connect to the Backend.");
     }
   };
 
@@ -65,10 +60,8 @@ const Login = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(credentials)
       });
-
       if (res.ok) {
         const data = await res.json();
-        // Store session in localStorage (Proxy Pattern for Session Management)
         localStorage.setItem('user', JSON.stringify({ 
           loggedIn: true, 
           username: credentials.username,
@@ -79,7 +72,7 @@ const Login = () => {
         alert("Login failed. Check your credentials."); 
       }
     } catch (error) {
-      alert("Backend is unreachable. Check Port 8081.");
+      alert("Backend is unreachable.");
     }
   };
 
@@ -99,6 +92,7 @@ const Login = () => {
 
 // --- DASHBOARD COMPONENT ---
 const Dashboard = () => {
+  const user = JSON.parse(localStorage.getItem('user')); 
   const [sessions, setSessions] = useState([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [selectedSession, setSelectedSession] = useState(null);
@@ -124,19 +118,54 @@ const Dashboard = () => {
       const res = await fetch(`${API_BASE_URL}/sessions`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newSession)
+        body: JSON.stringify({ ...newSession, createdBy: user.username })
       });
       if (res.ok) {
         setShowCreateModal(false);
+        setNewSession({ topic: '', location: '', date: '', time: '', maxParticipants: 5 }); 
         fetchSessions();
       }
     } catch (err) { alert("Error creating session."); }
   };
 
+  const handleJoinSession = async (sessionId) => {
+    try {
+      const res = await fetch(`${API_BASE_URL}/sessions/${sessionId}/join`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(user.username) 
+      });
+      if (res.ok) {
+        alert("Successfully joined the session!");
+        setSelectedSession(null); 
+        fetchSessions(); 
+      } else {
+        const msg = await res.text();
+        alert(msg || "Could not join session.");
+      }
+    } catch (err) {
+      console.error("Join failed:", err);
+    }
+  };
+
+  const handleDeleteSession = async (sessionId) => {
+    if (!window.confirm("Are you sure you want to delete this session?")) return;
+    try {
+      const res = await fetch(`${API_BASE_URL}/sessions/${sessionId}`, {
+        method: 'DELETE'
+      });
+      if (res.ok) {
+        alert("Session deleted successfully.");
+        setSelectedSession(null);
+        fetchSessions();
+      }
+    } catch (err) { console.error("Delete failed:", err); }
+  };
+
   return (
     <div className="container">
       <header style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px'}}>
-        <h2>Available Study Sessions</h2>
+        <h1>Available Study Sessions</h1>
         <button className="btn" style={{width: 'auto'}} onClick={() => setShowCreateModal(true)}>
           + Create Session
         </button>
@@ -149,24 +178,39 @@ const Dashboard = () => {
             <h3>{session.location}</h3>
             <p>{session.date} at {session.time}</p>
             <div className="capacity-text">
-              Capacity: {session.currentParticipants || 0} / {session.maxParticipants}
+              Spots: {session.currentParticipants || 0} / {session.maxParticipants}
             </div>
             <button className="btn" onClick={() => setSelectedSession(session)}>View Details</button>
           </div>
         ))}
       </div>
 
-      {/* CREATE MODAL */}
       {showCreateModal && (
         <div className="modal-overlay">
           <div className="card modal-content">
             <h3>Create New Session</h3>
             <form onSubmit={handleCreateSession}>
-              <div className="input-group"><input type="text" placeholder="Topic" onChange={e => setNewSession({...newSession, topic: e.target.value})} required /></div>
-              <div className="input-group"><input type="text" placeholder="Location" onChange={e => setNewSession({...newSession, location: e.target.value})} required /></div>
-              <div className="input-group"><input type="date" onChange={e => setNewSession({...newSession, date: e.target.value})} required /></div>
-              <div className="input-group"><input type="time" onChange={e => setNewSession({...newSession, time: e.target.value})} required /></div>
-              <div className="input-group"><input type="number" placeholder="Max Participants" onChange={e => setNewSession({...newSession, maxParticipants: e.target.value})} required /></div>
+              <div className="input-group">
+                <input type="text" placeholder="Topic" value={newSession.topic} 
+                  onChange={e => setNewSession({...newSession, topic: e.target.value})} required />
+              </div>
+              <div className="input-group">
+                <input type="text" placeholder="Location" value={newSession.location} 
+                  onChange={e => setNewSession({...newSession, location: e.target.value})} required />
+              </div>
+              <div className="input-group">
+                <input type="date" value={newSession.date} 
+                  onChange={e => setNewSession({...newSession, date: e.target.value})} required />
+              </div>
+              <div className="input-group">
+                <input type="time" value={newSession.time} 
+                  onChange={e => setNewSession({...newSession, time: e.target.value})} required />
+              </div>
+              <div className="input-group">
+                <label style={{fontSize: '0.8rem', color: '#666'}}>Max Participants:</label>
+                <input type="number" value={newSession.maxParticipants} 
+                  onChange={e => setNewSession({...newSession, maxParticipants: e.target.value})} required />
+              </div>
               <button type="submit" className="btn">Post Session</button>
               <button type="button" className="btn-secondary" onClick={() => setShowCreateModal(false)}>Cancel</button>
             </form>
@@ -174,7 +218,6 @@ const Dashboard = () => {
         </div>
       )}
 
-      {/* DETAILS MODAL */}
       {selectedSession && (
         <div className="modal-overlay">
           <div className="card modal-content">
@@ -182,7 +225,41 @@ const Dashboard = () => {
             <p><strong>Where:</strong> {selectedSession.location}</p>
             <p><strong>When:</strong> {selectedSession.date} at {selectedSession.time}</p>
             <p><strong>Spots:</strong> {selectedSession.currentParticipants} / {selectedSession.maxParticipants}</p>
-            <button className="btn" onClick={() => setSelectedSession(null)}>Close</button>
+            <p><strong>Created by:</strong> {selectedSession.createdBy}</p>
+            
+            <div style={{display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '20px'}}>
+              <button 
+                className="btn" 
+                disabled={
+                    selectedSession.participantUsernames?.includes(user.username) || 
+                    selectedSession.currentParticipants >= selectedSession.maxParticipants
+                }
+                onClick={() => handleJoinSession(selectedSession.id)}
+                style={{
+                  backgroundColor: selectedSession.participantUsernames?.includes(user.username) 
+                    ? '#6c757d' 
+                    : selectedSession.currentParticipants >= selectedSession.maxParticipants ? '#ccc' : '#4CAF50',
+                  cursor: (selectedSession.participantUsernames?.includes(user.username) || selectedSession.currentParticipants >= selectedSession.maxParticipants) ? 'not-allowed' : 'pointer'
+                }}
+              >
+                {selectedSession.participantUsernames?.includes(user.username) 
+                  ? 'Already Joined' 
+                  : selectedSession.currentParticipants >= selectedSession.maxParticipants 
+                    ? 'Session Full' 
+                    : 'Join This Session'}
+              </button>
+
+              {selectedSession.createdBy === user.username && (
+                <button 
+                  className="btn" 
+                  style={{backgroundColor: '#ff4d4d'}} 
+                  onClick={() => handleDeleteSession(selectedSession.id)}
+                >
+                  Delete My Session
+                </button>
+              )}
+              <button className="btn-secondary" onClick={() => setSelectedSession(null)}>Close</button>
+            </div>
           </div>
         </div>
       )}
@@ -190,7 +267,6 @@ const Dashboard = () => {
   );
 };
 
-// --- MAIN APP ---
 function App() {
   const user = JSON.parse(localStorage.getItem('user'));
 

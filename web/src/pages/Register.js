@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { apiService } from './services/api'; // 1. Import your Facade
-import './App.css';
+import '../App.css';
 
 const Register = () => {
   const [formData, setFormData] = useState({ username: '', email: '', password: '' });
