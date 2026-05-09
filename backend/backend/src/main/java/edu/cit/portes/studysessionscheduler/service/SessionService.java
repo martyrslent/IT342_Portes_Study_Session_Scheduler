@@ -1,7 +1,7 @@
 package edu.cit.portes.studysessionscheduler.service;
 
 import edu.cit.portes.studysessionscheduler.factory.SessionFactory;
-import edu.cit.portes.studysessionscheduler.model.StudySession;
+import edu.cit.portes.studysessionscheduler.features.sessions.StudySession;
 import edu.cit.portes.studysessionscheduler.repository.SessionRepository;
 import org.springframework.stereotype.Service;
 import java.util.List;

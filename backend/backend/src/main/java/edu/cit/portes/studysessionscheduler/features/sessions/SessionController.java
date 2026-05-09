@@ -1,6 +1,5 @@
-package edu.cit.portes.studysessionscheduler.controller;
+package edu.cit.portes.studysessionscheduler.features.sessions;
 
-import edu.cit.portes.studysessionscheduler.model.StudySession;
 import edu.cit.portes.studysessionscheduler.service.SessionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;

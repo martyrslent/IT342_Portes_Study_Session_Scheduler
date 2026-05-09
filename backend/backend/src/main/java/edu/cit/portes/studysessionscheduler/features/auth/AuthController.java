@@ -1,7 +1,4 @@
-package edu.cit.portes.studysessionscheduler.controller;
-
-import edu.cit.portes.studysessionscheduler.model.User;
-import edu.cit.portes.studysessionscheduler.repository.UserRepository;
+package edu.cit.portes.studysessionscheduler.features.auth;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;

@@ -1,4 +1,4 @@
-package edu.cit.portes.studysessionscheduler.model;
+package edu.cit.portes.studysessionscheduler.features.auth;
 
 import jakarta.persistence.*;
 import lombok.Data;

@@ -1,6 +1,6 @@
 package edu.cit.portes.studysessionscheduler.factory;
 
-import edu.cit.portes.studysessionscheduler.model.StudySession;
+import edu.cit.portes.studysessionscheduler.features.sessions.StudySession;
 
 public class SessionFactory {
     
