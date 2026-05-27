@@ -22,7 +22,6 @@ public class SessionService {
 
     public StudySession createSession(StudySession sessionRequest) {
 
-        // ✅ Pass imageUrl into the factory now
         StudySession validatedSession = SessionFactory.createDefaultSession(
             sessionRequest.getTopic(),
             sessionRequest.getLocation(),
