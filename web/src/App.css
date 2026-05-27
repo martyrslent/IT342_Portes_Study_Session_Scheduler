@@ -1,173 +1,376 @@
-/* --- Global Variables & Resets --- */
-:root {
-  --primary: #4f46e5;      /* Institutional Blue */
-  --primary-hover: #4338ca;
-  --bg-main: #f8fafc;     /* Light Gray Background */
-  --text-dark: #1e293b;
-  --text-muted: #64748b;
-  --white: #ffffff;
-  --danger: #ef4444;      /* For "Full" status alerts */
-  --success: #22c55e;     /* For available spots */
+/* =========================
+   GLOBAL STYLES
+========================= */
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Inter', sans-serif;
+  background: #f4f7fb;
+  color: #1a202c;
 }
 
 * {
   box-sizing: border-box;
-  margin: 0;
-  padding: 0;
 }
 
-body {
-  font-family: 'Inter', -apple-system, sans-serif;
-  background-color: var(--bg-main);
-  color: var(--text-dark);
-  line-height: 1.5;
-}
+/* =========================
+   NAVBAR
+========================= */
 
-/* --- Layout Components --- */
-.container {
-  max-width: 1100px;
-  margin: 0 auto;
-  padding: 2rem 1rem;
-}
-
-.card {
-  background: var(--white);
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-  border: 1px solid #e2e8f0;
-}
-
-/* --- Study Session Grid --- */
-.session-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 20px;
-  margin-top: 2rem;
-}
-
-.session-card {
-  background: var(--white);
-  border-radius: 12px;
-  padding: 1.5rem;
-  border: 1px solid #e2e8f0;
-  transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.session-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-}
-
-/* --- Badges & Status --- */
-.badge {
-  display: inline-block;
-  padding: 0.25rem 0.75rem;
-  border-radius: 9999px;
-  font-size: 0.75rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  background: #e0e7ff;
-  color: var(--primary);
-  margin-bottom: 0.75rem;
-}
-
-.capacity-text {
-  font-size: 0.875rem;
-  font-weight: 600;
-  margin: 1rem 0;
-}
-
-.status-full { color: var(--danger); }
-.status-open { color: var(--success); }
-
-/* --- Forms & Buttons --- */
-.input-group {
-  margin-bottom: 1.25rem;
-}
-
-input {
-  width: 100%;
-  padding: 0.75rem;
-  border: 1px solid #cbd5e1;
-  border-radius: 8px;
-  font-size: 1rem;
-  transition: border-color 0.2s;
-}
-
-input:focus {
-  outline: none;
-  border-color: var(--primary);
-  ring: 2px solid #c7d2fe;
-}
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background-color: var(--primary);
-  color: white;
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
-  font-weight: 600;
-  border: none;
-  cursor: pointer;
-  width: 100%;
-  transition: background-color 0.2s;
-}
-
-.btn:hover { background-color: var(--primary-hover); }
-
-.btn:disabled {
-  background-color: #94a3b8;
-  cursor: not-allowed;
-}
-
-/* --- Navigation --- */
 .navbar {
-  background: var(--white);
-  border-bottom: 1px solid #e2e8f0;
-  padding: 1rem 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+
   display: flex;
   justify-content: space-between;
   align-items: center;
-  position: sticky;
-  top: 0;
-  z-index: 100;
+
+  padding: 18px 40px;
+
+  background: rgba(255, 255, 255, 0.82);
+  backdrop-filter: blur(12px);
+
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
 }
+
+/* =========================
+   LOGO
+========================= */
 
 .logo {
-  font-weight: 800;
-  font-size: 1.5rem;
-  color: var(--primary);
   text-decoration: none;
+
+  font-size: 1.7rem;
+  font-weight: 800;
+
+  color: #1a202c;
+
+  letter-spacing: -0.7px;
+
+  transition: 0.25s ease;
 }
 
+.logo:hover {
+  opacity: 0.85;
+}
+
+/* =========================
+   NAV BUTTONS
+========================= */
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.nav-btn,
+.logout-btn {
+  text-decoration: none;
+
+  padding: 10px 22px;
+
+  border-radius: 999px;
+
+  font-size: 0.95rem;
+  font-weight: 600;
+
+  transition: all 0.25s ease;
+
+  cursor: pointer;
+  border: none;
+}
+
+/* LOGIN BUTTON */
+
+.login-btn {
+  color: #2d3748;
+
+  background: white;
+
+  border: 1px solid #d1d5db;
+
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+
+.login-btn:hover {
+  background: #f8fafc;
+
+  transform: translateY(-2px);
+
+  box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+}
+
+/* REGISTER BUTTON */
+
+.register-btn {
+  color: white;
+
+  background: linear-gradient(
+    135deg,
+    #3b82f6,
+    #4f46e5
+  );
+
+  box-shadow: 0 8px 20px rgba(79, 70, 229, 0.28);
+}
+
+.register-btn:hover {
+  transform: translateY(-2px) scale(1.03);
+
+  box-shadow: 0 12px 28px rgba(79, 70, 229, 0.38);
+}
+
+/* LOGOUT BUTTON */
+
+.logout-btn {
+  background: #ef4444;
+  color: white;
+}
+
+.logout-btn:hover {
+  background: #dc2626;
+
+  transform: translateY(-2px);
+
+  box-shadow: 0 10px 20px rgba(239, 68, 68, 0.28);
+}
+
+/* =========================
+   CONTAINER
+========================= */
+
+.container {
+  width: 100%;
+  max-width: 1200px;
+
+  margin: auto;
+
+  padding: 40px 20px;
+}
+
+/* =========================
+   CARD
+========================= */
+
+.card {
+  background: white;
+
+  border-radius: 18px;
+
+  padding: 30px;
+
+  box-shadow:
+    0 4px 10px rgba(0,0,0,0.03),
+    0 12px 30px rgba(0,0,0,0.05);
+}
+
+/* =========================
+   INPUTS
+========================= */
+
+.input-group {
+  margin-bottom: 18px;
+}
+
+.input-group input {
+  width: 100%;
+
+  padding: 14px 16px;
+
+  border-radius: 12px;
+
+  border: 1px solid #d1d5db;
+
+  font-size: 1rem;
+
+  transition: 0.2s ease;
+}
+
+.input-group input:focus {
+  outline: none;
+
+  border-color: #4f46e5;
+
+  box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.12);
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.btn {
+  width: 100%;
+
+  padding: 14px;
+
+  border: none;
+
+  border-radius: 14px;
+
+  background: linear-gradient(
+    135deg,
+    #3b82f6,
+    #4f46e5
+  );
+
+  color: white;
+
+  font-size: 1rem;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: all 0.25s ease;
+
+  box-shadow: 0 8px 18px rgba(79,70,229,0.22);
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+
+  box-shadow: 0 12px 28px rgba(79,70,229,0.32);
+}
+
+.btn-secondary {
+  width: 100%;
+
+  padding: 14px;
+
+  border: none;
+
+  border-radius: 14px;
+
+  background: #edf2f7;
+
+  color: #2d3748;
+
+  font-size: 1rem;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  transition: 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background: #e2e8f0;
+}
+
+/* =========================
+   SESSION CARD
+========================= */
+
+.session-card {
+  transition: all 0.25s ease;
+}
+
+.session-card:hover {
+  transform: translateY(-5px);
+
+  box-shadow:
+    0 10px 20px rgba(0,0,0,0.06),
+    0 20px 40px rgba(0,0,0,0.08);
+}
+
+/* =========================
+   BADGES
+========================= */
+
+.badge {
+  display: inline-block;
+
+  padding: 6px 12px;
+
+  border-radius: 999px;
+
+  font-size: 0.8rem;
+  font-weight: 600;
+
+  background: #e0e7ff;
+  color: #4338ca;
+}
+
+/* =========================
+   MODALS
+========================= */
 
 .modal-overlay {
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.5);
+
+  inset: 0;
+
+  background: rgba(0,0,0,0.45);
+
   display: flex;
   justify-content: center;
   align-items: center;
+
+  padding: 20px;
+
   z-index: 1000;
 }
+
 .modal-content {
-  width: 90%;
-  max-width: 500px;
-  background: white;
-  animation: slideUp 0.3s ease-out;
+  animation: modalPop 0.25s ease;
 }
-.btn-secondary {
-  background: none;
-  border: none;
-  color: #64748b;
-  margin-top: 10px;
-  cursor: pointer;
-  width: 100%;
+
+@keyframes modalPop {
+  from {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
 }
-@keyframes slideUp {
-  from { transform: translateY(20px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+
+/* =========================
+   SLIDER
+========================= */
+
+.slider-layout::-webkit-scrollbar {
+  height: 8px;
+}
+
+.slider-layout::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 999px;
+}
+
+.slider-layout::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 768px) {
+
+  .navbar {
+    padding: 16px 20px;
+  }
+
+  .logo {
+    font-size: 1.3rem;
+  }
+
+  .nav-btn,
+  .logout-btn {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+  }
+
+  .card {
+    padding: 22px;
+  }
+
+  .container {
+    padding: 25px 15px;
+  }
 }

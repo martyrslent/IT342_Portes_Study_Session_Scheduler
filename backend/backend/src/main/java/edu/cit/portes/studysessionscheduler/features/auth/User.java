@@ -1,4 +1,4 @@
-package edu.cit.portes.studysessionscheduler.model;
+package edu.cit.portes.studysessionscheduler.features.auth;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -20,4 +20,12 @@ public class User {
 
     @Column(nullable = false)
     private String password; // This will store the BCrypt hash
+
+    // --- ADMINISTRATIVE & MODERATION ADDITIONS ---
+
+    @Column(nullable = false)
+    private String role = "ROLE_STUDENT"; // Default authorization tier for regular student registrations
+
+    @Column(nullable = false)
+    private boolean active = true; // Tracks system suspension status; defaults to allowed access
 }

@@ -1,3 +1,4 @@
+// src/main/java/edu/cit/portes/studysessionscheduler/config/SecurityConfig.java
 package edu.cit.portes.studysessionscheduler.config;
 
 import org.springframework.context.annotation.Bean;
@@ -12,19 +13,27 @@ public class SecurityConfig {
 
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // This fulfills the BCrypt requirement
+        return new BCryptPasswordEncoder();
     }
     
     @Bean
-public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-    http
-        .cors(org.springframework.security.config.Customizer.withDefaults()) // Use standard CORS defaults
-        .csrf(csrf -> csrf.disable()) 
-        .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/api/auth/**").permitAll() 
-            .requestMatchers("/api/sessions/**").permitAll() 
-            .anyRequest().authenticated() 
-        );
-     return http.build();
-}
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .cors(org.springframework.security.config.Customizer.withDefaults())
+            .csrf(csrf -> csrf.disable()) // Disabled for local REST environment testing
+            .authorizeHttpRequests(auth -> auth
+                // 1. Explicitly allow public authentication entry points
+                .requestMatchers("/api/auth/**").permitAll() 
+                
+                // 2. Allow public access to session feeds for student viewing
+                .requestMatchers("/api/sessions/**").permitAll() 
+                
+                // 3. Keep administrative controls fully open for development testing
+                .requestMatchers("/api/admin/**").permitAll() 
+                
+                // 4. Fallback condition for everything else
+                .anyRequest().permitAll() 
+            );
+        return http.build();
+    }
 }
